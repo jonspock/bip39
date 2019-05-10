@@ -9289,6 +9289,13 @@ ECPair.prototype.sign = function (hash) {
   return ecdsa.sign(hash, this.d)
 }
 
+ECPair.prototype.toSecretCashAddress = function () {
+    if (!this.d) throw new Error('Missing private key')
+    //      var prefix = decoded.network === Network.Mainnet ? 'dvtpriv' : 'testpriv'
+    // var prefix = 'testpriv' // later get from network
+    return bchaddr.encodeAsSecretCashAddress('testpriv', this.d)
+}
+    
 ECPair.prototype.toWIF = function () {
   if (!this.d) throw new Error('Missing private key')
 

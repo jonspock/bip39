@@ -15,6 +15,19 @@ bitcoinjs.bitcoin.networks.bitcoin.p2wpkh = {
     wif: 0x80
 };
 
+bitcoinjs.bitcoin.networks.dvt.p2wpkh = {
+    baseNetwork: "devault",
+    messagePrefix: '\x18Devault Signed Message:\n',
+    bech32: 'devault',
+    bip32: {
+        public: 0x04b24746,
+        private: 0x04b2430c
+    },
+    pubKeyHash: 0x00,
+    scriptHash: 0x05,
+    wif: 0x80
+};
+
 bitcoinjs.bitcoin.networks.testnet.p2wpkh = {
     baseNetwork: "testnet",
     messagePrefix: '\x18Bitcoin Signed Message:\n',

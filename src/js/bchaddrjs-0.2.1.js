@@ -3416,7 +3416,7 @@ var ValidationError = validation.ValidationError;
  *
  * @private
  */
-var VALID_PREFIXES = ['bitcoincash', 'bchtest', 'bchreg', 'simpleledger', 'slptest'];
+  var VALID_PREFIXES = ['devault','dvtest','dvtpriv','testpriv'];
 
 /**
  * Checks whether a string is a valid prefix; ie., it has a single letter case
@@ -3477,7 +3477,9 @@ function getTypeBits(type) {
   case 'P2PKH':
     return 0;
   case 'P2SH':
-    return 8;
+      return 8;
+  case 'SECRET':
+      return 2; // Guess HACK????XXXX
   default:
     throw new ValidationError('Invalid type: ' + type + '.');
   }
@@ -3498,6 +3500,8 @@ function getType(versionByte) {
     return 'P2PKH';
   case 8:
     return 'P2SH';
+  case 2:
+    return 'SECRET';
   default:
     throw new ValidationError('Invalid address type in version byte: ' + versionByte + '.');
   }
@@ -9140,7 +9144,7 @@ function decodeCashAddress (address) {
     } catch (error) {
     }
   } else {
-    var prefixes = ['bitcoincash', 'bchtest', 'regtest', 'simpleledger', 'slptest']
+      var prefixes = ['devault','dvtest']
     for (var i = 0; i < prefixes.length; ++i) {
       try {
         var prefix = prefixes[i]
@@ -9165,17 +9169,14 @@ function decodeCashAddressWithPrefix (address) {
     var hash = Array.prototype.slice.call(decoded.hash, 0)
     var type = decoded.type === 'P2PKH' ? Type.P2PKH : Type.P2SH
     switch (decoded.prefix) {
-      case 'bitcoincash':
-      case 'simpleledger':
+      case 'devault':
         return {
           hash: hash,
           format: Format.Cashaddr,
           network: Network.Mainnet,
           type: type
         }
-      case 'bchtest':
-      case 'slptest':
-      case 'regtest':
+      case 'dvtest':
         return {
           hash: hash,
           format: Format.Cashaddr,
@@ -9223,7 +9224,7 @@ function encodeAsBitpay (decoded) {
  * @returns {string}
  */
 function encodeAsCashaddr (decoded) {
-  var prefix = decoded.network === Network.Mainnet ? 'bitcoincash' : 'bchtest'
+  var prefix = decoded.network === Network.Mainnet ? 'dvtest' : 'dvtest'
   var type = decoded.type === Type.P2PKH ? 'P2PKH' : 'P2SH'
   var hash = Uint8Array.from(decoded.hash)
   return cashaddr.encode(prefix, type, hash)
@@ -9254,14 +9255,13 @@ function isLegacyAddress (address) {
 }
 
 /**
- * Returns a boolean indicating whether the address is in bitpay format.
- * @static
- * @param {string} address - A valid Bitcoin Cash address in any format.
- * @returns {boolean}
- * @throws {InvalidAddressError}
+ * Encodes the given private address into cashaddr format.
+ * @private
+ * @param {object} decoded
+ * @returns {string}
  */
-function isBitpayAddress (address) {
-  return detectAddressFormat(address) === Format.Bitpay
+function encodeAsSecretCashAddress (prefix, decoded) {
+  return cashaddr.encode(prefix, 'SECRET', decode)
 }
 
 /**
@@ -9343,9 +9343,9 @@ module.exports = {
   toLegacyAddress: toLegacyAddress,
   toBitpayAddress: toBitpayAddress,
   toCashAddress: toCashAddress,
+  encodeAsSecretCashAddress : encodeAsSecretCashAddress,
   toSlpAddress: toSlpAddress,
   isLegacyAddress: isLegacyAddress,
-  isBitpayAddress: isBitpayAddress,
   isCashAddress: isCashAddress,
   isMainnetAddress: isMainnetAddress,
   isTestnetAddress: isTestnetAddress,
